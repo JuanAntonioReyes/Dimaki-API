@@ -36,6 +36,31 @@ var Message = require("./models/message.js");
 // ============================
 
 app.get("/api/messages", function(req, res) {
+	
+	// THIS WORKS BUT I WANT TO TEST GEOSEARCH
+/*var query = Message.find({'geo': {
+			$near: [ 10, 10 ],
+			$maxDistance: 5
+	  }
+});
+
+	query.exec(function (err, message) {
+	  if (err) {
+	    console.log(err);
+	    throw err;
+	  }
+
+	  if (!message) {
+	    console.log("NOTHING");
+	  } else {
+	    console.log('MESSAGE: ' + message);
+	 }
+	});*/
+
+/*	var options = { near: [10, 10], maxDistance: 5 };
+	Message.geoSearch({}, options, function(err, res) {
+  	console.log(res);
+	});*/
 
 	Message.find({}, function (error, messages) {
 		if (error) {
