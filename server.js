@@ -9,6 +9,13 @@ var messageErrorJson = {
 			url: "http://#"
 		};
 
+// ============ TEST =========
+
+var config = require('./config/config.js');
+console.log(config.test);
+
+// ============================
+
 var messages = [];
 for (var i = 0; i < 10; i++) {
 	var message = {
