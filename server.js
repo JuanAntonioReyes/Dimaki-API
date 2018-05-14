@@ -41,6 +41,7 @@ var Message = require("./models/message.js");
 app.get("/api/messages/:lat/:lon", function(req, res) {
 
 	var radius = 5;
+	// TODO: CHECK HOW CAN I PASS THIS PARAMETERS LIKE THE ONES IN POST
 	var location = [ req.params.lat, req.params.lon ];
 
 	Message.find({'geo': {
