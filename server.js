@@ -36,12 +36,15 @@ var Message = require("./models/message.js");
 // ============================
 
 app.get("/api/messages", function(req, res) {
-	
+
+/*	var test = req.body;
+	console.log(test);*/
+
 	var radius = 5;
 	var latitude = 10;
 	var longitude = 10;
 
-	Message.find({'geo': {
+	Message.find({'location': {
 												$near: [ latitude, longitude ],
 												$maxDistance: radius
 											 }
@@ -59,14 +62,6 @@ app.get("/api/messages", function(req, res) {
 /*	var options = { near: [10, 10], maxDistance: 5 };
 	Message.geoSearch({}, options, function(err, res) {
   	console.log(res);
-	});*/
-
-/*	Message.find({}, function (error, messages) {
-		if (error) {
-			console.error(error);
-		}
-
-		res.json(messages);
 	});*/
 
 });
@@ -87,16 +82,12 @@ app.get("/api/messages/:id", function(req, res) {
 
 app.post("/api/messages", function(req, res) {
 	/*var db = req.db;*/
-	var newLatitude = req.body.latitude;
-	var newLongitude = req.body.longitude;
-	var newText = req.body.text;
+	var newMessageData = req.body;
+	//console.log(newMessageData);
 
-	if (newLatitude && newLongitude && newText) {
+	if (newMessageData.text) {
 
-		var newMessage = new Message({
-			text: newText,
-			geo: [ 10, 10 ]
-		});
+		var newMessage = new Message(newMessageData);
 
 		newMessage.save(function (error) {
 			if (error) {
