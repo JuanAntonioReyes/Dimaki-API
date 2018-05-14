@@ -38,10 +38,10 @@ var Message = require("./models/message.js");
 
 // ============================
 
-app.get("/api/messages", function(req, res) {
+app.get("/api/messages/:lat/:lon", function(req, res) {
 
 	var radius = 5;
-	var location = [ 10, 10 ];
+	var location = [ req.params.lat, req.params.lon ];
 
 	Message.find({'geo': {
 												$near: location,
