@@ -4,8 +4,8 @@ const app = express();
 app.use(express.urlencoded());
 
 var messageErrorJson = {
-			error: "Not found",
-			errorDescription: "The message was not found",
+			error: "MESSAGE ERROR",
+			errorDescription: "MESSAGE ERROR",
 			url: "http://#"
 		};
 
@@ -91,7 +91,9 @@ app.post("/api/messages", function(req, res) {
 });
 
 /*app.put("/api/messages/:id", function(req, res) {
-	
+	// NOT IMPLEMENTED
+	// BUT THIS WORKS WITH STATIC DATA
+
 	var id = req.params.id;
 
 	var selected = messages.filter( (message) => { return message.id == id } )[0] || null;
@@ -106,19 +108,17 @@ app.post("/api/messages", function(req, res) {
 
 });*/
 
-// COMMENTED WHILE MIGRATING METHODS TO MONGODB
-/*app.delete("/api/message/:id", function(req, res) {
+app.delete("/api/messages/:id", function(req, res) {
+
 	var id = req.params.id;
 
-	var selected = messages.filter( (message) => { return message.id == id } )[0] || null;
-
-	if (selected) {
-		var newMessages = messages.filter( (message) => { return message.id != id } ) || null;
-
-		messages = newMessages;
+	var db = req.db;
+	Message.remove({ _id: id }, function(error, post){
+		if (error) {
+			res.status(404).json(messageErrorJson);
+		}
 
 		res.sendStatus(204);
-	} else {
-		res.status(404).json(messageErrorJson);
-	}
-});*/
+	});
+
+});
