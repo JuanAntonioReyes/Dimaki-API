@@ -68,7 +68,7 @@ app.post("/api/messages", function(req, res) {
 	var newText = req.body.text;
 
 	if (newLatitude && newLongitude && newText) {
-console.log('Hello World!');
+
 		var newMessage = new Message({
 			latitude: newLatitude,
 			longitude: newLongitude,
