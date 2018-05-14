@@ -24,6 +24,8 @@ db.once("open", function(callback){
 	console.log("Connection to mongo correct");
 });
 
+var Message = require("./models/message.js");
+
 // ============================
 
 var messages = [];
@@ -54,19 +56,25 @@ app.get("/api/messages/:id", function(req, res) {
 });
 
 app.post("/api/messages", function(req, res) {
-	var newId = articles.length;
+	var db = req.db;
 	var newText = req.body.text;
 
 	if (newText) {
-		var newMessage = {
-			id: newId,
+
+		var newMessage = new Message({
 			text: newText
-		};
+		});
 
-		messages.push(newMessage);
+		newMessage.save(function (error) {
+			if (error) {
+				console.log(error);
+			}
 
-		res.status(201).json(newMessage);
+			res.status(201).json(newMessage);
+		});
+
 	} else {
+
 		var error = {
 			error: "Insufficient data",
 			errorDescription: "The POST method needs a message text",
@@ -74,6 +82,7 @@ app.post("/api/messages", function(req, res) {
 		};
 
 		res.status(400).json(error);
+		
 	}
 
 });
