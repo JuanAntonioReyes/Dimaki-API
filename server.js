@@ -22,6 +22,10 @@ var db = mongoose.connection;
 
 db.once("open", function(callback){
 	console.log("Connection to mongo correct");
+
+	app.listen(3000, function() {
+		console.log("Server started in port 3000");
+	});
 });
 
 var Message = require("./models/message.js");
@@ -39,10 +43,21 @@ for (var i = 0; i < 10; i++) {
 }
 
 app.get("/api/messages", function(req, res) {
-	res.json(messages);
+	//res.json(messages);
+					app.get('/posts', (req, res) => {
+				  Post.find({}, 'title description', function (error, posts) {
+				    if (error) { console.error(error); }
+				    res.send({
+				      posts: posts
+				    })
+				  }).sort({_id:-1})
+				})
+
+
 });
 
-app.get("/api/messages/:id", function(req, res) {
+// COMMENTED WHILE MIGRATING METHODS TO MONGODB
+/*app.get("/api/messages/:id", function(req, res) {
 	var id = req.params.id;
 
 	var selected = messages.filter( (message) => { return message.id == id } )[0] || null;
@@ -53,7 +68,7 @@ app.get("/api/messages/:id", function(req, res) {
 		res.status(404).json(messageErrorJson);
 	}
 
-});
+});*/
 
 app.post("/api/messages", function(req, res) {
 	var db = req.db;
@@ -82,7 +97,7 @@ app.post("/api/messages", function(req, res) {
 		};
 
 		res.status(400).json(error);
-		
+
 	}
 
 });
@@ -103,7 +118,8 @@ app.post("/api/messages", function(req, res) {
 
 });*/
 
-app.delete("/api/message/:id", function(req, res) {
+// COMMENTED WHILE MIGRATING METHODS TO MONGODB
+/*app.delete("/api/message/:id", function(req, res) {
 	var id = req.params.id;
 
 	var selected = messages.filter( (message) => { return message.id == id } )[0] || null;
@@ -117,8 +133,4 @@ app.delete("/api/message/:id", function(req, res) {
 	} else {
 		res.status(404).json(messageErrorJson);
 	}
-});
-
-app.listen(3000, function() {
-	console.log("Server started in port 3000");
-});
+});*/
