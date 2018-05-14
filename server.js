@@ -1,5 +1,8 @@
 const express = require('express');
+const bodyParser = require('body-parser')
+
 const app = express();
+app.use(bodyParser.json())
 
 app.use(express.urlencoded());
 
@@ -59,12 +62,16 @@ app.get("/api/messages/:id", function(req, res) {
 });
 
 app.post("/api/messages", function(req, res) {
-	var db = req.db;
+	/*var db = req.db;*/
+	var newLatitude = req.body.latitude;
+	var newLongitude = req.body.longitude;
 	var newText = req.body.text;
 
-	if (newText) {
-
+	if (newLatitude && newLongitude && newText) {
+console.log('Hello World!');
 		var newMessage = new Message({
+			latitude: newLatitude,
+			longitude: newLongitude,
 			text: newText
 		});
 
@@ -112,7 +119,7 @@ app.delete("/api/messages/:id", function(req, res) {
 
 	var id = req.params.id;
 
-	var db = req.db;
+	/*var db = req.db;*/
 	Message.remove({ _id: id }, function(error, post){
 		if (error) {
 			res.status(404).json(messageErrorJson);
