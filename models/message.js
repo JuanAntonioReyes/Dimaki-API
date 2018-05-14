@@ -3,10 +3,10 @@ var Schema = mongoose.Schema;
 
 var MessageSchema = new Schema({
   text: String,
-  geo: {
-    type: [Number],
-    index: '2d'
-  }
+	geo: {
+		type: [Number],
+		index: '2d'
+	}
 });
 
 var Message = mongoose.model("Message", MessageSchema);

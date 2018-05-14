@@ -37,38 +37,37 @@ var Message = require("./models/message.js");
 
 app.get("/api/messages", function(req, res) {
 	
-	// THIS WORKS BUT I WANT TO TEST GEOSEARCH
-/*var query = Message.find({'geo': {
-			$near: [ 10, 10 ],
-			$maxDistance: 5
-	  }
-});
+	var radius = 5;
+	var latitude = 10;
+	var longitude = 10;
 
-	query.exec(function (err, message) {
-	  if (err) {
-	    console.log(err);
-	    throw err;
-	  }
+	Message.find({'geo': {
+												$near: [ latitude, longitude ],
+												$maxDistance: radius
+											 }
+							 },
+		function (error, messages) {
+			if (error) {
+				console.error(error);
+			}
 
-	  if (!message) {
-	    console.log("NOTHING");
-	  } else {
-	    console.log('MESSAGE: ' + message);
-	 }
-	});*/
+			res.json(messages);
+		}
+	);
 
+// TEST HOW THIS WORKS AND IF IT CAN REPLACE the simple find
 /*	var options = { near: [10, 10], maxDistance: 5 };
 	Message.geoSearch({}, options, function(err, res) {
   	console.log(res);
 	});*/
 
-	Message.find({}, function (error, messages) {
+/*	Message.find({}, function (error, messages) {
 		if (error) {
 			console.error(error);
 		}
 
 		res.json(messages);
-	});
+	});*/
 
 });
 
