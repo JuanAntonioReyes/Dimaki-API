@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-app.get("/api/articles", function(req, res) {
+app.get("/", function(req, res) {
 	res.send('Hello');
 });
 
