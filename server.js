@@ -3,10 +3,11 @@ const bodyParser = require('body-parser')
 
 const app = express();
 app.use(bodyParser.json())
-
 app.use(express.urlencoded());
 
-var messageErrorJson = {
+const serverPort = 3000;
+
+const messageErrorJson = {
 			error: "MESSAGE ERROR",
 			errorDescription: "MESSAGE ERROR",
 			url: "http://#"
@@ -26,8 +27,8 @@ var db = mongoose.connection;
 db.once("open", function(callback){
 	console.log("Connection to mongo correct");
 
-	app.listen(3000, function() {
-		console.log("Server started in port 3000");
+	app.listen(serverPort, function() {
+		console.log("Server started in port " + serverPort);
 	});
 });
 
@@ -37,15 +38,11 @@ var Message = require("./models/message.js");
 
 app.get("/api/messages", function(req, res) {
 
-/*	var test = req.body;
-	console.log(test);*/
-
 	var radius = 5;
-	var latitude = 10;
-	var longitude = 10;
+	var location = [ 10, 10 ];
 
-	Message.find({'location': {
-												$near: [ latitude, longitude ],
+	Message.find({'geo': {
+												$near: location,
 												$maxDistance: radius
 											 }
 							 },
@@ -57,12 +54,6 @@ app.get("/api/messages", function(req, res) {
 			res.json(messages);
 		}
 	);
-
-// TEST HOW THIS WORKS AND IF IT CAN REPLACE the simple find
-/*	var options = { near: [10, 10], maxDistance: 5 };
-	Message.geoSearch({}, options, function(err, res) {
-  	console.log(res);
-	});*/
 
 });
 
@@ -131,9 +122,9 @@ app.post("/api/messages", function(req, res) {
 
 app.delete("/api/messages/:id", function(req, res) {
 
-	var id = req.params.id;
-
 	/*var db = req.db;*/
+	var id = req.params.id;
+	
 	Message.remove({ _id: id }, function(error, post){
 		if (error) {
 			res.status(404).json(messageErrorJson);

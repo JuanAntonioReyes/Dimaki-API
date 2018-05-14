@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var MessageSchema = new Schema({
   text: String,
-	location: {
+	geo: {
 		type: [Number],
 		index: '2d'
 	}
