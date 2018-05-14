@@ -32,44 +32,31 @@ var Message = require("./models/message.js");
 
 // ============================
 
-/*var messages = [];
-for (var i = 0; i < 10; i++) {
-	var message = {
-		id: i,
-		text: "Mensaje prueba " + i
-	};
-
-	messages.push(message);
-}*/
-
 app.get("/api/messages", function(req, res) {
-	//res.json(messages);
 	
 	Message.find({}, function (error, messages) {
 		if (error) {
 			console.error(error);
 		}
 
-		res.json({
-			messages: messages
-		})
+		res.json(messages);
 	});
 
 });
 
-// COMMENTED WHILE MIGRATING METHODS TO MONGODB
-/*app.get("/api/messages/:id", function(req, res) {
+app.get("/api/messages/:id", function(req, res) {
 	var id = req.params.id;
 
-	var selected = messages.filter( (message) => { return message.id == id } )[0] || null;
+	Message.findById(id, function (error, message) {
+		if (error) {
+			console.error(error);
+			res.status(404).json(messageErrorJson);
+		}
 
-	if (selected) {
-		res.json(selected);
-	} else {
-		res.status(404).json(messageErrorJson);
-	}
+		res.json(message);
+	});
 
-});*/
+});
 
 app.post("/api/messages", function(req, res) {
 	var db = req.db;
