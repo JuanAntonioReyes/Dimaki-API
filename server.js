@@ -36,7 +36,7 @@ var Message = require("./models/message.js");
 // ============================
 
 app.get("/api/messages", function(req, res) {
-	
+
 	Message.find({}, function (error, messages) {
 		if (error) {
 			console.error(error);
@@ -70,9 +70,8 @@ app.post("/api/messages", function(req, res) {
 	if (newLatitude && newLongitude && newText) {
 
 		var newMessage = new Message({
-			latitude: newLatitude,
-			longitude: newLongitude,
-			text: newText
+			text: newText,
+			geo: [ 10, 10 ]
 		});
 
 		newMessage.save(function (error) {

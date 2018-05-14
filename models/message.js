@@ -2,9 +2,11 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var MessageSchema = new Schema({
-	latitude: String,
-	longitude: String,
-  text: String
+  text: String,
+  geo: {
+    type: [Number],
+    index: '2d'
+  }
 });
 
 var Message = mongoose.model("Message", MessageSchema);
