@@ -9,10 +9,20 @@ var messageErrorJson = {
 			url: "http://#"
 		};
 
-// ============ TEST =========
+// ============ MONGO =========
 
 var config = require('./config/config.js');
-console.log(config.test);
+var mongoose = require('mongoose');
+
+mongoose.connect(config.mongoDB);
+
+var db = mongoose.connection;
+
+// Control DB error with db.on("error",...
+
+db.once("open", function(callback){
+	console.log("Connection to mongo correct");
+});
 
 // ============================
 
