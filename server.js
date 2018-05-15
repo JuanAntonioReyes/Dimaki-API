@@ -39,15 +39,15 @@ var Message = require("./models/message.js");
 // ============================
 
 //app.get("/api/messages/:lat/:lon", function(req, res) {
-app.get("/api/messages/:lon/:lat", function(req, res) {
+app.get("/api/messages/:lat/:lon", function(req, res) {
 	// TODO: CHECK HOW CAN I PASS THE LOCATION PARAMETERS LIKE THE ONES IN POST
 
-	var maxDistance = 100;
+	var maxDistance = 0.001; // In radias
 	var location = [ req.params.lat, req.params.lon ];
 
-  Message.find({geo: {
+  Message.find({location: {
   										$near: location,
-  										$maxDistance: (maxDistance / 6378100)
+  										$maxDistance: maxDistance
   									 }
   						 },
   	function (error, messages) {
@@ -61,7 +61,7 @@ app.get("/api/messages/:lon/:lat", function(req, res) {
 
 });
 
-app.get("/api/messages/:id", function(req, res) {
+/*app.get("/api/messages/:id", function(req, res) {
 	var id = req.params.id;
 
 	Message.findById(id, function (error, message) {
@@ -73,14 +73,13 @@ app.get("/api/messages/:id", function(req, res) {
 		res.json(message);
 	});
 
-});
+});*/
 
 app.post("/api/messages", function(req, res) {
-	/*var db = req.db;*/
 	var newMessageData = req.body;
 	//console.log(newMessageData);
 
-	// TODO: We need to control that all the data has benn sended to the post
+	// TODO: I need to control that all the data has been sent to the post
 	if (newMessageData.text) {
 
 		var newMessage = new Message(newMessageData);
@@ -125,9 +124,8 @@ app.post("/api/messages", function(req, res) {
 
 });*/
 
-app.delete("/api/messages/:id", function(req, res) {
+/*app.delete("/api/messages/:id", function(req, res) {
 
-	/*var db = req.db;*/
 	var id = req.params.id;
 	
 	Message.remove({ _id: id }, function(error, post){
@@ -138,4 +136,4 @@ app.delete("/api/messages/:id", function(req, res) {
 		res.sendStatus(204);
 	});
 
-});
+});*/
