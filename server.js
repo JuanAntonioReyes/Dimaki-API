@@ -42,21 +42,19 @@ var Message = require("./models/message.js");
 app.get("/api/messages/:lon/:lat", function(req, res) {
 	// TODO: CHECK HOW CAN I PASS THE LOCATION PARAMETERS LIKE THE ONES IN POST
 
-	var maxDistance = 10;
+	var maxDistance = 100;
 	var location = [ req.params.lat, req.params.lon ];
-
-	console.log(location);
 
   Message.find({geo: {
   										$near: location,
-  										$maxDistance: maxDistance
+  										$maxDistance: (maxDistance / 6378100)
   									 }
   						 },
   	function (error, messages) {
 			if (error) {
 				console.error(error);
 			}
-			console.log(messages);
+
 			res.json(messages);
 		}
 	);
