@@ -38,22 +38,25 @@ var Message = require("./models/message.js");
 
 // ============================
 
-app.get("/api/messages/:lat/:lon", function(req, res) {
+//app.get("/api/messages/:lat/:lon", function(req, res) {
+app.get("/api/messages/:lon/:lat", function(req, res) {
+	// TODO: CHECK HOW CAN I PASS THE LOCATION PARAMETERS LIKE THE ONES IN POST
 
-	var radius = 5;
-	// TODO: CHECK HOW CAN I PASS THIS PARAMETERS LIKE THE ONES IN POST
+	var maxDistance = 10;
 	var location = [ req.params.lat, req.params.lon ];
 
-	Message.find({'geo': {
-												$near: location,
-												$maxDistance: radius
-											 }
-							 },
-		function (error, messages) {
+	console.log(location);
+
+  Message.find({geo: {
+  										$near: location,
+  										$maxDistance: maxDistance
+  									 }
+  						 },
+  	function (error, messages) {
 			if (error) {
 				console.error(error);
 			}
-
+			console.log(messages);
 			res.json(messages);
 		}
 	);
@@ -79,6 +82,7 @@ app.post("/api/messages", function(req, res) {
 	var newMessageData = req.body;
 	//console.log(newMessageData);
 
+	// TODO: We need to control that all the data has benn sended to the post
 	if (newMessageData.text) {
 
 		var newMessage = new Message(newMessageData);
