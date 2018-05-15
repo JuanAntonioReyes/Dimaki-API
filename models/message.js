@@ -6,7 +6,12 @@ var MessageSchema = new Schema({
 	geo: {
 		type: [Number],
 		index: '2d'
-	}
+	},
+	date: Number,
+	from: String,
+	public: Boolean,
+	to: [String],
+	duration: Number
 });
 
 var Message = mongoose.model("Message", MessageSchema);
