@@ -11,7 +11,7 @@ var MessageSchema = new Schema({
 	from: String,
 	public: Boolean,
 	to: [String],
-	duration: Number
+	expirationDate: Number
 });
 
 var Message = mongoose.model("Message", MessageSchema);

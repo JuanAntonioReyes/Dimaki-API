@@ -38,11 +38,10 @@ var Message = require("./models/message.js");
 
 // ============================
 
-//app.get("/api/messages/:lat/:lon", function(req, res) {
 app.get("/api/messages/:lat/:lon", function(req, res) {
 	// TODO: CHECK HOW CAN I PASS THE LOCATION PARAMETERS LIKE THE ONES IN POST
 
-	var maxDistance = 0.001; // In radias
+	var maxDistance = 0.01; // In radians (TODO: Check how to do in meters)
 	var location = [ req.params.lat, req.params.lon ];
 
   Message.find({location: {
@@ -77,9 +76,8 @@ app.get("/api/messages/:lat/:lon", function(req, res) {
 
 app.post("/api/messages", function(req, res) {
 	var newMessageData = req.body;
-	//console.log(newMessageData);
-
-	// TODO: I need to control that all the data has been sent to the post
+	
+	// TODO: I need to control that all the required data has been sent to the post
 	if (newMessageData.text) {
 
 		var newMessage = new Message(newMessageData);
