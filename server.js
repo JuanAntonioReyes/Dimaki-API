@@ -58,7 +58,7 @@ app.get("/api/messages/:lat/:lon", function(req, res) {
 				console.error(error);
 			}
 
-			res.json(messages);
+			return res.json(messages);
 		}
 	);
 
@@ -70,10 +70,10 @@ app.get("/api/messages/:lat/:lon", function(req, res) {
 	Message.findById(id, function (error, message) {
 		if (error) {
 			console.error(error);
-			res.status(404).json(errorJson);
+			return res.status(404).json(errorJson);
 		}
 
-		res.json(message);
+		return res.json(message);
 	});
 
 });*/
@@ -91,7 +91,7 @@ app.post("/api/messages", function(req, res) {
 				console.log(error);
 			}
 
-			res.status(201).json(newMessage);
+			return res.status(201).json(newMessage);
 		});
 
 	} else {
@@ -132,15 +132,25 @@ app.post("/api/messages", function(req, res) {
 	
 	Message.remove({ _id: id }, function(error, post){
 		if (error) {
-			res.status(404).json(errorJson);
+			return res.status(404).json(errorJson);
 		}
 
-		res.sendStatus(204);
+		return res.sendStatus(204);
 	});
 
 });*/
 
 // =============== AUTH =======================================================
+
+function createToken(user) {
+	var payload = { id: user._id };
+	var options = { expiresIn: 86400 /*24 hours*/ };
+
+	// Create token
+	var token = jwt.sign(payload, config.tokenSecret, options);
+
+	return token;
+}
 
 app.post("/api/register", function(req, res) {
 
@@ -162,26 +172,23 @@ app.post("/api/register", function(req, res) {
 		}
 
 		// Create token
-		var token = jwt.sign({ id: newUser._id },
-													config.tokenSecret,
-													{ expiresIn: 86400 /*24 hours*/ }
-												);
+		var token = createToken(newUser);
 
 		var response = { auth: true, token: token };
 
-		res.status(201).json(response);
+		return res.status(201).json(response);
 	});
 
 });
 
-app.get('/api/loggedUser', function(req, res) {
+app.get("/api/loggedUser", function(req, res) {
 
 	var token = req.headers['x-access-token'];
 
 	if (!token) {
 		var response = { auth: false, message: 'No user token' };
 
-		return res.status(401).json(response);
+		res.status(401).json(response);
 	}
 
 	jwt.verify(token, config.tokenSecret, function(error, decoded) {
@@ -191,7 +198,6 @@ app.get('/api/loggedUser', function(req, res) {
 			return res.status(500).json(response);
 		}
 
-		//res.send(decoded);
 		User.findById(decoded.id, { pass: 0 }, function (error, user) {
 
 			if (error) {
@@ -199,12 +205,45 @@ app.get('/api/loggedUser', function(req, res) {
 			}
 
 			if (!user) {
+				// No user found
 				return res.status(404).send(errorJson);
 			}
 
-			res.json(user);
+			return res.json(user);
 		});
 
+	});
+
+});
+
+app.post("/api/login", function(req, res) {
+
+	var pass = req.body.pass;
+	var email = req.body.email;
+
+	User.findOne({ email: email }, function (error, user) {
+		if (error) {
+			return res.status(500).json(errorJson);
+		}
+
+		if (!user) {
+			// No user found
+			return res.status(404).json(errorJson);
+		}
+
+		var validPass = bcrypt.compareSync(pass, user.pass);
+		if (!validPass) {
+			var response = { auth: false, token: null };
+
+			return res.status(401).json(response);
+		}
+
+		// Create token
+		var token = createToken(user);
+
+		var response = { auth: true, token: token };
+
+		return res.send(response);
 	});
 
 });
