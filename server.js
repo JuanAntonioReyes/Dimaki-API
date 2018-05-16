@@ -152,6 +152,34 @@ function createToken(user) {
 	return token;
 }
 
+// Verify token middleware
+function verifyToken(req, res, next) {
+
+	var token = req.headers['x-access-token'];
+
+	if (!token) {
+		var response = { auth: false, message: 'No user token' };
+
+		res.status(401).json(response);
+	}
+
+	jwt.verify(token, config.tokenSecret, function(error, decoded) {
+		if (error) {
+			var response = { auth: false, message: 'Invalid user token' }
+
+			return res.status(500).json(response);
+		}
+
+		// Put the decoded id in the req to use it in the other fucntions
+		req.userId = decoded.id;
+
+		next();
+	});
+
+}
+
+module.exports = verifyToken;
+
 app.post("/api/register", function(req, res) {
 
 	var newUserData = req.body;
@@ -181,37 +209,20 @@ app.post("/api/register", function(req, res) {
 
 });
 
-app.get("/api/loggedUser", function(req, res) {
+app.get("/api/loggedUser", verifyToken, function(req, res) {
 
-	var token = req.headers['x-access-token'];
+	User.findById(req.userId, { pass: 0 }, function (error, user) {
 
-	if (!token) {
-		var response = { auth: false, message: 'No user token' };
-
-		res.status(401).json(response);
-	}
-
-	jwt.verify(token, config.tokenSecret, function(error, decoded) {
 		if (error) {
-			var response = { auth: false, message: 'Invalid user token' }
-
-			return res.status(500).json(response);
+			return res.status(500).send(errorJson);
 		}
 
-		User.findById(decoded.id, { pass: 0 }, function (error, user) {
+		if (!user) {
+			// No user found
+			return res.status(404).send(errorJson);
+		}
 
-			if (error) {
-				return res.status(500).send(errorJson);
-			}
-
-			if (!user) {
-				// No user found
-				return res.status(404).send(errorJson);
-			}
-
-			return res.json(user);
-		});
-
+		return res.json(user);
 	});
 
 });
