@@ -1,5 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser')
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
+const config = require('./config/config.js');
 
 const app = express();
 const cors = require('cors');
@@ -17,7 +21,6 @@ const messageErrorJson = {
 
 // ============ MONGO =========
 
-var config = require('./config/config.js');
 var mongoose = require('mongoose');
 
 mongoose.connect(config.mongoDB);
@@ -35,6 +38,7 @@ db.once("open", function(callback){
 });
 
 var Message = require("./models/message.js");
+var User = require("./models/user.js");
 
 // ============================
 
@@ -135,3 +139,62 @@ app.post("/api/messages", function(req, res) {
 	});
 
 });*/
+
+// =============== AUTH =======================================================
+
+app.post("/api/register", function(req, res) {
+
+	var newUserData = req.body;
+	/*newUserData:
+			-name
+			-pass
+			-email
+	*/
+
+	// Hash the password
+	newUserData.pass = bcrypt.hashSync(newUserData.pass, 8);
+
+	var newUser = new User(newUserData);
+
+	newUser.save(function (error) {
+		if (error) {
+			console.log(error);
+		}
+
+		// Create token
+		var token = jwt.sign({ id: newUser._id },
+													config.tokenSecret,
+													{ expiresIn: 86400 /*24 hours*/ }
+												);
+
+		var response = { auth: true, token: token };
+
+		res.status(201).json(response);
+	});
+
+});
+
+app.get('/api/loggedUser', function(req, res) {
+
+	var token = req.headers['x-access-token'];
+
+	if (!token) {
+		var response = { auth: false, message: 'No user token' };
+
+		return res.status(401).json(response);
+	}
+
+	jwt.verify(token, config.tokenSecret, function(error, decoded) {
+		if (error) {
+			var response = { auth: false, message: 'Invalid user token' }
+
+			return res.status(500).json(response);
+		}
+
+		res.status(200).send(decoded);
+	});
+});
+
+// ============================================================================
+
+
