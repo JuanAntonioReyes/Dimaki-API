@@ -180,7 +180,7 @@ function verifyToken(req, res, next) {
 
 module.exports = verifyToken;
 
-app.post("/api/register", function(req, res) {
+app.post("/api/registerUser", function(req, res) {
 
 	var newUserData = req.body;
 	/*newUserData:
@@ -227,7 +227,7 @@ app.get("/api/loggedUser", verifyToken, function(req, res) {
 
 });
 
-app.post("/api/login", function(req, res) {
+app.post("/api/loginUser", function(req, res) {
 
 	var pass = req.body.pass;
 	var email = req.body.email;
@@ -261,11 +261,11 @@ app.post("/api/login", function(req, res) {
 
 });
 
-app.get('/api/logout', function(req, res) {
+/*app.get('/api/logoutUser', function(req, res) {
 	var response = { auth: false, token: null };
 
 	res.json(response);
-});
+});*/
 
 // ============================================================================
 
