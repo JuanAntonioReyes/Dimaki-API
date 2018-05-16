@@ -232,7 +232,7 @@ app.post("/api/login", function(req, res) {
 		}
 
 		var validPass = bcrypt.compareSync(pass, user.pass);
-		
+
 		if (!validPass) {
 			var response = { auth: false, token: null };
 
@@ -247,6 +247,12 @@ app.post("/api/login", function(req, res) {
 		return res.send(response);
 	});
 
+});
+
+app.get('/api/logout', function(req, res) {
+	var response = { auth: false, token: null };
+
+	res.json(response);
 });
 
 // ============================================================================
