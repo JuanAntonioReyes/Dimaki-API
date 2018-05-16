@@ -13,9 +13,9 @@ app.use(cors());
 
 const serverPort = 3000;
 
-const messageErrorJson = {
-			error: "MESSAGE ERROR",
-			errorDescription: "MESSAGE ERROR",
+const errorJson = {
+			error: "ERROR",
+			errorDescription: "ERROR",
 			url: "http://#"
 		};
 
@@ -70,7 +70,7 @@ app.get("/api/messages/:lat/:lon", function(req, res) {
 	Message.findById(id, function (error, message) {
 		if (error) {
 			console.error(error);
-			res.status(404).json(messageErrorJson);
+			res.status(404).json(errorJson);
 		}
 
 		res.json(message);
@@ -121,7 +121,7 @@ app.post("/api/messages", function(req, res) {
 		
 		res.json(selected);
 	} else {
-		res.status(404).json(messageErrorJson);
+		res.status(404).json(errorJson);
 	}
 
 });*/
@@ -132,7 +132,7 @@ app.post("/api/messages", function(req, res) {
 	
 	Message.remove({ _id: id }, function(error, post){
 		if (error) {
-			res.status(404).json(messageErrorJson);
+			res.status(404).json(errorJson);
 		}
 
 		res.sendStatus(204);
@@ -191,8 +191,22 @@ app.get('/api/loggedUser', function(req, res) {
 			return res.status(500).json(response);
 		}
 
-		res.status(200).send(decoded);
+		//res.send(decoded);
+		User.findById(decoded.id, { pass: 0 }, function (error, user) {
+
+			if (error) {
+				return res.status(500).send(errorJson);
+			}
+
+			if (!user) {
+				return res.status(404).send(errorJson);
+			}
+
+			res.json(user);
+		});
+
 	});
+
 });
 
 // ============================================================================
