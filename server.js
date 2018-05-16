@@ -64,7 +64,7 @@ app.get("/api/messages/:lat/:lon", function(req, res) {
 
 });
 
-app.get("/api/messages/:id", function(req, res) {
+/*app.get("/api/messages/:id", function(req, res) {
 	var id = req.params.id;
 
 	Message.findById(id, function (error, message) {
@@ -76,7 +76,7 @@ app.get("/api/messages/:id", function(req, res) {
 		return res.json(message);
 	});
 
-});
+});*/
 
 app.post("/api/messages", function(req, res) {
 	var newMessageData = req.body;
