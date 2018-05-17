@@ -78,7 +78,7 @@ app.get("/api/messages/:lat/:lon", function(req, res) {
 
 });*/
 
-app.post("/api/messages", function(req, res) {
+app.post("/api/messages", verifyToken, function(req, res) {
 	var newMessageData = req.body;
 	
 	// TODO: I need to control that all the required data has been sent to the post
@@ -178,8 +178,6 @@ function verifyToken(req, res, next) {
 
 }
 
-module.exports = verifyToken;
-
 app.post("/api/registerUser", function(req, res) {
 
 	var newUserData = req.body;
@@ -221,7 +219,7 @@ app.get("/api/loggedUser", verifyToken, function(req, res) {
 			// No user found
 			return res.status(404).send(errorJson);
 		}
-
+		
 		return res.json(user);
 	});
 
@@ -230,9 +228,9 @@ app.get("/api/loggedUser", verifyToken, function(req, res) {
 app.post("/api/loginUser", function(req, res) {
 
 	var pass = req.body.pass;
-	var email = req.body.email;
+	var name = req.body.name;
 
-	User.findOne({ email: email }, function (error, user) {
+	User.findOne({ name: name }, function (error, user) {
 		if (error) {
 			return res.status(500).json(errorJson);
 		}
