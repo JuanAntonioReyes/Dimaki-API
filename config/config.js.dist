@@ -3,5 +3,6 @@ var dbPass = 'YOUR_DB_PASS_HERE';
 var mongoDBBase = 'mongodb://' + dbUser + ':' + dbPass + '@';
 
 module.exports = {
-	mongoDB: mongoDBBase + 'YOUR_DB_HERE'
+	mongoDB: mongoDBBase + 'YOUR_DB_HERE',
+	tokenSecret: 'YOUR_TOKEN_SECRET_HERE'
 }
