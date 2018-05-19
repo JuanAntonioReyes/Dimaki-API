@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 var MessageSchema = new Schema({
   text: String,
 	location: {
-		type: [Number],
-		index: '2d'
+		type: { type: String },
+		coordinates: []
 	},
 	date: Number,
 	from: String,
@@ -13,6 +13,8 @@ var MessageSchema = new Schema({
 	to: [String],
 	expirationDate: Number
 });
+
+MessageSchema.index({ "location": "2dsphere" });
 
 var Message = mongoose.model("Message", MessageSchema);
 module.exports = Message;
