@@ -181,7 +181,7 @@ function createToken(user) {
 function verifyToken(req, res, next) {
 
 	var token = req.headers['x-access-token'];
-
+	
 	if (!token) {
 		var response = {
 			auth: false,
