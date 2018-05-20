@@ -42,14 +42,15 @@ var User = require("./models/user.js");
 
 // ============================
 
-app.get("/api/messages/:lat/:lon", function(req, res) {
+app.get("/api/messages/:lat/:lon/:maxDist", function(req, res) {
 	// TODO: CHECK HOW CAN I PASS THE LOCATION PARAMETERS LIKE THE ONES IN POST
 
-	//var maxDistance = 0.01; // In radians (TODO: Check how to do in meters)
-	var maxDistance = 50;
-	var minDistance = 0;
 	//var location = [ req.params.lat, req.params.lon ];
 	var location = [ req.params.lon, req.params.lat ];
+	//var maxDistance = 0.01; // In radians (TODO: Check how to do in meters)
+	// var maxDistance = 50;
+	var maxDistance = req.params.maxDist;
+	var minDistance = 0;
 
 /*	Message.find({location: {
 											$near: location,
