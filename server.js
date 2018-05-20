@@ -207,6 +207,7 @@ app.post("/api/registerUser", function(req, res) {
 			-name
 			-pass
 			-email
+			-registerDate
 	*/
 
 	// Hash the password

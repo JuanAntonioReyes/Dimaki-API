@@ -10,6 +10,7 @@ var MessageSchema = new Schema({
 	date: Number,
 	from: String,
 	public: Boolean,
+	hidden: Boolean,
 	to: [String],
 	expirationDate: Number
 });
