@@ -13,12 +13,6 @@ app.use(cors());
 
 const serverPort = 3000;
 
-const errorJson = {
-			error: "ERROR",
-			errorDescription: "ERROR",
-			url: "http://#"
-		};
-
 // ============ MONGO =========
 
 var mongoose = require('mongoose');
@@ -79,7 +73,12 @@ app.get("/api/messages/:lat/:lon/:maxDist/:minDist", function(req, res) {
 							 },
 		function (error, messages) {
 			if (error) {
-				console.error(error);
+				//console.error(error);
+				var response = {
+					error: error,
+					message: "Error getting the messages from the location"
+				};
+				return res.status(400).json(response);
 			}
 
 			return res.json(messages);
@@ -112,7 +111,11 @@ app.post("/api/messages", verifyToken, function(req, res) {
 
 		newMessage.save(function (error) {
 			if (error) {
-				console.log(error);
+				var response = {
+					error: error,
+					message: "Error saving the new message"
+				};
+				return res.status(500).json(response);
 			}
 
 			return res.status(201).json(newMessage);
@@ -120,13 +123,11 @@ app.post("/api/messages", verifyToken, function(req, res) {
 
 	} else {
 
-		var error = {
-			error: "Insufficient data",
-			errorDescription: "The POST method needs a message text",
-			url: "http://#"
+		var response = {
+			error: error,
+			message: "Insufficient data provided to create a new message"
 		};
-
-		res.status(400).json(error);
+		res.status(400).json(response);
 
 	}
 
@@ -182,16 +183,20 @@ function verifyToken(req, res, next) {
 	var token = req.headers['x-access-token'];
 
 	if (!token) {
-		var response = { auth: false, message: 'No user token' };
-
+		var response = {
+			auth: false,
+			message: 'No user token provided'
+		};
 		res.status(401).json(response);
 	}
 
 	jwt.verify(token, config.tokenSecret, function(error, decoded) {
 		if (error) {
-			var response = { auth: false, message: 'Invalid user token' }
-
-			return res.status(500).json(response);
+			var response = {
+				auth: false,
+				message: 'Invalid user token'
+			};
+			return res.status(401).json(response);
 		}
 
 		// Put the decoded id in the req to use it in the other fucntions
@@ -212,23 +217,44 @@ app.post("/api/registerUser", function(req, res) {
 			-registerDate
 	*/
 
-	// Hash the password
-	newUserData.pass = bcrypt.hashSync(newUserData.pass, 8);
+	if (newUserData.name && newUserData.pass &&
+			newUserData.email && newUserData.registerDate) {
 
-	var newUser = new User(newUserData);
+		// Hash the password
+		newUserData.pass = bcrypt.hashSync(newUserData.pass, 8);
 
-	newUser.save(function (error) {
-		if (error) {
-			console.log(error);
-		}
+		var newUser = new User(newUserData);
 
-		// Create token
-		var token = createToken(newUser);
+		newUser.save(function (error) {
+			if (error) {
+				//console.log(error);
+				var response = {
+					error: error,
+					message: "Error registering the user"
+				};
+				return res.json(response);
+			}
 
-		var response = { auth: true, token: token };
+			// Create token
+			var token = createToken(newUser);
 
-		return res.status(201).json(response);
-	});
+			var response = {
+				auth: true,
+				token: token
+			};
+
+			return res.status(201).json(response);
+		});
+
+	} else {
+
+		var response = {
+			error: error,
+			message: "Insufficient data provided to create a new user"
+		};
+		res.status(400).json(response);
+
+	}
 
 });
 
@@ -237,12 +263,19 @@ app.get("/api/loggedUser", verifyToken, function(req, res) {
 	User.findById(req.userId, { pass: 0 }, function (error, user) {
 
 		if (error) {
-			return res.status(500).send(errorJson);
+			var response = {
+				error: error,
+				message: "Error retrieving the logged user"
+			};
+			return res.status(500).send(response);
 		}
 
 		if (!user) {
 			// No user found
-			return res.status(404).send(errorJson);
+			var response = {
+				message: "No user found"
+			};
+			return res.status(404).send(response);
 		}
 		
 		return res.json(user);
@@ -255,32 +288,56 @@ app.post("/api/loginUser", function(req, res) {
 	var pass = req.body.pass;
 	var name = req.body.name;
 
-	User.findOne({ name: name }, function (error, user) {
-		if (error) {
-			return res.status(500).json(errorJson);
-		}
+	if (pass && name) {
 
-		if (!user) {
-			// No user found
-			return res.status(404).json(errorJson);
-		}
+		User.findOne({ name: name }, function (error, user) {
+			if (error) {
+				var response = {
+					error: error,
+					message: "Error loging the user"
+				};
+				return res.status(500).json(response);
+			}
 
-		var validPass = bcrypt.compareSync(pass, user.pass);
+			if (!user) {
+				// No user found
+				var response = {
+					message: "No user found"
+				};
+				return res.status(404).json(response);
+			}
 
-		if (!validPass) {
-			var response = { auth: false, token: null };
+			var validPass = bcrypt.compareSync(pass, user.pass);
 
-			return res.status(401).json(response);
-		}
+			if (!validPass) {
+				var response = {
+					auth: false,
+					token: null
+				};
+				return res.status(401).json(response);
+			}
 
-		// Create token
-		var token = createToken(user);
+			// Create token
+			var token = createToken(user);
 
-		var response = { auth: true, token: token };
+			var response = {
+				auth: true,
+				token: token
+			};
 
-		//console.log("LOGIN SUCCESS");
-		return res.send(response);
-	});
+			//console.log("LOGIN SUCCESS");
+			return res.send(response);
+		});
+
+	} else {
+
+		var response = {
+			error: error,
+			message: "Insufficient data provided to login a user"
+		};
+		res.status(400).json(response);
+
+	}
 
 });
 
