@@ -11,8 +11,6 @@ app.use(bodyParser.json())
 app.use(express.urlencoded());
 app.use(cors());
 
-const serverPort = 3000;
-
 // ============ MONGO =========
 
 var mongoose = require('mongoose');
@@ -26,9 +24,12 @@ var db = mongoose.connection;
 db.once("open", function(callback){
 	console.log("Connection to mongo correct");
 
-	app.listen(serverPort, function() {
+/*	app.listen(serverPort, function() {
 		console.log("Server started in port " + serverPort);
-	});
+	});*/
+
+	const port = process.env.PORT || 3000;
+	app.listen(port, () => console.log("Server started on port " + port));
 });
 
 var Message = require("./models/message.js");
