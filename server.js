@@ -49,9 +49,9 @@ app.get("/api/messages/:lat/:lon/:maxDist/:minDist", function(req, res) {
 	var location = [ req.params.lon, req.params.lat ];
 	//var maxDistance = 0.01; // In radians (TODO: Check how to do in meters)
 	// var maxDistance = 50;
-	var maxDistance = req.params.maxDist;
+	var maxDistance = req.params.maxDist; // In meters
 	//var minDistance = 0;
-	var minDistance = req.params.minDist;
+	var minDistance = req.params.minDist; // In meters
 
 /*	Message.find({location: {
 											$near: location,
