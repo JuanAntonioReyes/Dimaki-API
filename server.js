@@ -160,6 +160,9 @@ app.post("/api/registerUser", function(req, res) {
 // ==============================================================
 	if (newUserData.name && newUserData.pass &&
 			newUserData.email && newUserData.registerDate) {
+		
+		// Convert the name to uppercase
+		newUserData.name = newUserData.name.toUpperCase();
 
 		// Hash the password
 		newUserData.pass = bcrypt.hashSync(newUserData.pass, 8);
@@ -236,6 +239,8 @@ app.post("/api/loginUser", function(req, res) {
 // BEFORE SAVING ANYTHING TO THE DATABASE
 // ==============================================================
 	if (pass && name) {
+		// Convert the name to uppercase
+		name = name.toUpperCase();
 
 		User.findOne({ name: name }, function (error, user) {
 
@@ -277,7 +282,7 @@ app.post("/api/loginUser", function(req, res) {
 			};
 
 			return res.send(response);
-			
+
 		});
 
 	} else {
