@@ -62,13 +62,28 @@ app.get("/api/messages/:lat/:lon/:maxDist/:minDist", function(req, res) {
 
 app.post("/api/messages", verifyToken, function(req, res) {
 	var newMessageData = req.body;
-// ==============================================================
-// TODO:
-// CHECK HERE THAT ALL THE DATA HAS BEEN SENDED AND IS CORRECT
-// BEFORE SAVING ANYTHING TO THE DATABASE
-// ==============================================================
-	if (newMessageData.text) {
 
+	if (newMessageData.text && typeof(newMessageData.hidden) === 'boolean') {
+		// Check if the message text is at least 5 characters long
+		if (newMessageData.text.length < 5) {
+			var response = {
+				error: 2,
+				message:
+					"The message is too short (Less than 5 characters)"
+			};
+
+			return res.status(400).json(response);
+		}
+
+		// Save the message date
+		newMessageData.date = Date.now();
+
+		// Extra message info not implemented yet
+		newMessageData.public = true;
+		newMessageData.to = [];
+		newMessageData.expirationDate = -1;
+
+		// Create the new message and save it
 		var newMessage = new Message(newMessageData);
 
 		newMessage.save(function (error) {
@@ -87,7 +102,7 @@ app.post("/api/messages", verifyToken, function(req, res) {
 	} else {
 
 		var response = {
-			error: error,
+			error: 1,
 			message: "Insufficient data provided to create a new message"
 		};
 
@@ -145,21 +160,30 @@ function verifyToken(req, res, next) {
 
 app.post("/api/registerUser", function(req, res) {
 	var newUserData = req.body;
-// ==============================================================
-// TODO:
-// CHECK HERE THAT ALL THE DATA HAS BEEN SENDED AND IS CORRECT
-// BEFORE SAVING ANYTHING TO THE DATABASE
-// 	newUserData:
-//			-name
-//			-pass
-//			-email
-//			-registerDate	
-// ==============================================================
-	if (newUserData.name && newUserData.pass &&
-			newUserData.email && newUserData.registerDate) {
-		
+
+	if (newUserData.name && newUserData.pass && newUserData.email) {
+		// Check if the username and the password are at 
+		// least 5 characters long and maximum 30 characters each
+		if ((newUserData.name.length < 5) || (newUserData.name.length < 5) ||
+				(newUserData.name.length > 30) || (newUserData.name.length > 30)) {
+			var response = {
+				error: 2,
+				message:
+					"The username and password must be between 5 and 30 characters long"
+			};
+
+			return res.status(400).json(response);
+		}
+
 		// Convert the name to uppercase
 		newUserData.name = newUserData.name.toUpperCase();
+
+		// Check if the username already exists in the DB
+// -------------------------------------------------
+// -------------------------------------------------
+
+		// Save the registration date
+		newUserData.registerDate = Date.now();
 
 		// Hash the password
 		newUserData.pass = bcrypt.hashSync(newUserData.pass, 8);
@@ -171,10 +195,10 @@ app.post("/api/registerUser", function(req, res) {
 			if (error) {
 				var response = {
 					error: error,
-					message: "Error registering the user"
+					message: "Error registering the user. Try again later."
 				};
 
-				return res.json(response);
+				return res.status(500).json(response);
 			}
 
 			// Create token
@@ -192,16 +216,17 @@ app.post("/api/registerUser", function(req, res) {
 	} else {
 
 		var response = {
-			error: error,
+			error: 1,
 			message: "Insufficient data provided to create a new user"
 		};
 
-		res.status(400).json(response);
+		return res.status(400).json(response);
 
 	}
 });
 
-app.get("/api/loggedUser", verifyToken, function(req, res) {
+// NOT USED YET
+/*app.get("/api/loggedUser", verifyToken, function(req, res) {
 
 	User.findById(req.userId, { pass: 0 }, function (error, user) {
 		if (error) {
@@ -225,16 +250,12 @@ app.get("/api/loggedUser", verifyToken, function(req, res) {
 		return res.json(user);
 	});
 
-});
+});*/
 
 app.post("/api/loginUser", function(req, res) {
 	var pass = req.body.pass;
 	var name = req.body.name;
-// ==============================================================
-// TODO:
-// CHECK HERE THAT ALL THE DATA HAS BEEN SENDED AND IS CORRECT
-// BEFORE SAVING ANYTHING TO THE DATABASE
-// ==============================================================
+
 	if (pass && name) {
 		// Convert the name to uppercase
 		name = name.toUpperCase();
@@ -244,7 +265,7 @@ app.post("/api/loginUser", function(req, res) {
 			if (error) {
 				var response = {
 					error: error,
-					message: "Error loging the user"
+					message: "Error loging the user. Try again later."
 				};
 
 				return res.status(500).json(response);
@@ -253,7 +274,8 @@ app.post("/api/loginUser", function(req, res) {
 			if (!user) {
 				// No user found
 				var response = {
-					message: "No user found"
+					error: 2,
+					message: "User not found"
 				};
 
 				return res.status(404).json(response);
@@ -263,8 +285,10 @@ app.post("/api/loginUser", function(req, res) {
 
 			if (!validPass) {
 				var response = {
+					error: 3,
 					auth: false,
-					token: null
+					token: null,
+					message: "Incorrect password"
 				};
 
 				return res.status(401).json(response);
@@ -285,8 +309,8 @@ app.post("/api/loginUser", function(req, res) {
 	} else {
 
 		var response = {
-			error: error,
-			message: "Insufficient data provided to login a user"
+			error: 1,
+			message: "Insufficient data provided to login an user"
 		};
 
 		res.status(400).json(response);
