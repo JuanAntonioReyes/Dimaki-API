@@ -47,18 +47,15 @@ app.get("/api/messages/:lat/:lon/:maxDist/:minDist", function(req, res) {
 													}
 							 },
 		function (error, messages) {
-
 			if (error) {
 				var response = {
 					error: error,
 					message: "Error getting the messages from the location"
 				};
-
 				return res.status(400).json(response);
 			}
 
 			return res.json(messages);
-
 		}
 	);
 });
