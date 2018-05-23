@@ -60,7 +60,7 @@ app.get("/api/messages/:lat/:lon/:maxDist/:minDist", function(req, res) {
 	);
 });
 
-app.post("/api/messages", verifyToken, function(req, res) {
+app.post("/api/messages", verifyToken, async function(req, res) {
 	var newMessageData = req.body;
 
 	if (newMessageData.text && typeof(newMessageData.hidden) === 'boolean') {
@@ -77,6 +77,21 @@ app.post("/api/messages", verifyToken, function(req, res) {
 
 		// Save the message date
 		newMessageData.date = Date.now();
+
+		await User.findById(req.userId, function (error, user) {
+			if (error) {
+				var response = {
+					error: error,
+					message: "Error retrieving the logged user"
+				};
+
+				return res.status(500).send(response);
+			}
+
+			if (user) {
+				newMessageData.from = user.name;
+			}	
+		});
 
 		// Extra message info not implemented yet
 		newMessageData.public = true;
@@ -158,7 +173,7 @@ function verifyToken(req, res, next) {
 
 }
 
-app.post("/api/registerUser", function(req, res) {
+app.post("/api/registerUser", async function(req, res) {
 	var newUserData = req.body;
 
 	if (newUserData.name && newUserData.pass && newUserData.email) {
@@ -175,13 +190,33 @@ app.post("/api/registerUser", function(req, res) {
 			return res.status(400).json(response);
 		}
 
+		// Remove the spaces at the start and the end of the username and pass
+		newUserData.name = newUserData.name.trim();
+		newUserData.pass = newUserData.pass.trim();
+
 		// Convert the name to uppercase
 		newUserData.name = newUserData.name.toUpperCase();
 
 		// Check if the username already exists in the DB
-// -------------------------------------------------
-// -------------------------------------------------
+		var nameUsed = false;
 
+		await User.findOne({ name: newUserData.name }, function (error, user) {
+			if (user) {
+				nameUsed = true;
+			}
+
+		});
+
+		if (nameUsed) {
+			var response = {
+				error: 3,
+				message:
+					"The username is already in use"
+			};
+
+			return res.status(400).json(response);	
+		}
+	
 		// Save the registration date
 		newUserData.registerDate = Date.now();
 
@@ -257,6 +292,10 @@ app.post("/api/loginUser", function(req, res) {
 	var name = req.body.name;
 
 	if (pass && name) {
+		// Remove the spaces at the start and the end of the username and pass
+		name = name.trim();
+		pass = pass.trim();
+
 		// Convert the name to uppercase
 		name = name.toUpperCase();
 
