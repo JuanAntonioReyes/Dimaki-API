@@ -16,7 +16,7 @@ npm install
 - Configure the MongoDB and token secret in config/config.js (Template provided in 'config/config.js.dist')
 
 ## Usage
-- Launch the project
+- Start the server
 
 ```
 npm start
