@@ -18,7 +18,7 @@ mongoose.connect(config.mongoDB);
 
 var db = mongoose.connection;
 
-// Control DB error with db.on("error",...
+// TODO: Control DB error with db.on("error",...
 
 db.once("open", function(callback){
 	console.log("Connection to mongo correct");
@@ -31,21 +31,24 @@ var Message = require("./models/message.js");
 var User = require("./models/user.js");
 // ============ /MONGO ========
 
-app.get("/api/messages/:lat/:lon/:maxDist/:minDist", function(req, res) {
+app.get("/api/messages/:lat/:lon/:minDist/:maxDist", function(req, res) {
 	var location = [ req.params.lon, req.params.lat ];
-	var maxDistance = req.params.maxDist; // In meters
 	var minDistance = req.params.minDist; // In meters
+	var maxDistance = req.params.maxDist; // In meters
 
-	Message.find({location: {
-														$near: {
-															$geometry: { type: "Point",
-																					 coordinates: location
-																				 },
-															$maxDistance: maxDistance,
-															$minDistance: minDistance
-														}
-													}
-							 },
+	var searchParams = {
+											$geometry: { type: "Point",
+																	 coordinates: location
+																 },
+											//$maxDistance: maxDistance,
+											$minDistance: minDistance
+										};
+	// Only set the maxDistance if the parameter is not 0
+	if (maxDistance !== '0') {
+		searchParams.$maxDistance = maxDistance;
+	}
+
+	Message.find({ location: { $near: searchParams } },
 		function (error, messages) {
 			if (error) {
 				var response = {
@@ -159,7 +162,7 @@ function verifyToken(req, res, next) {
 		if (error) {
 			var response = {
 				auth: false,
-				message: 'Invalid user token'
+				message: error.message
 			};
 
 			return res.status(401).json(response);
