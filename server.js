@@ -63,6 +63,46 @@ app.get("/api/messages/:lat/:lon/:minDist/:maxDist", function(req, res) {
 	);
 });
 
+app.get("/api/userMessages", verifyToken, async function(req, res) {
+	var userName;
+
+	await User.findById(req.userId, function (error, user) {
+		if (error) {
+			var response = {
+				error: error,
+				message: "Error retrieving the logged user"
+			};
+
+			return res.status(500).send(response);
+		}
+
+		if (!user) {
+			// No user found
+			var response = {
+				message: "No user found"
+			};
+
+			return res.status(404).send(response);
+		}
+		
+		userName = user.name;
+	});
+
+	Message.find({ from: userName },
+		function (error, messages) {
+			if (error) {
+				var response = {
+					error: error,
+					message: "Error getting the messages from the user"
+				};
+				return res.status(400).json(response);
+			}
+
+			return res.json(messages);
+		}
+	);
+});
+
 app.post("/api/messages", verifyToken, async function(req, res) {
 	var newMessageData = req.body;
 
