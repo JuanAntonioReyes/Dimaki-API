@@ -265,6 +265,7 @@ app.post("/api/registerUser", async function(req, res) {
 
 app.get("/api/loggedUser", verifyToken, function(req, res) {
 
+	// Get the user by id to return it (Without the password)
 	User.findById(req.userId, { pass: 0 }, function (error, user) {
 		if (error) {
 			var response = {
