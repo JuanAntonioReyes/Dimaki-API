@@ -263,8 +263,7 @@ app.post("/api/registerUser", async function(req, res) {
 	}
 });
 
-// NOT USED YET
-/*app.get("/api/loggedUser", verifyToken, function(req, res) {
+app.get("/api/loggedUser", verifyToken, function(req, res) {
 
 	User.findById(req.userId, { pass: 0 }, function (error, user) {
 		if (error) {
@@ -288,7 +287,7 @@ app.post("/api/registerUser", async function(req, res) {
 		return res.json(user);
 	});
 
-});*/
+});
 
 app.post("/api/loginUser", function(req, res) {
 	var pass = req.body.pass;
