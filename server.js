@@ -105,6 +105,7 @@ app.get("/api/userMessages", verifyToken, async function(req, res) {
 
 app.post("/api/messages", verifyToken, async function(req, res) {
 	var newMessageData = req.body;
+	newMessageData.from = "111";
 
 	if (newMessageData.text && typeof(newMessageData.hidden) === 'boolean') {
 		// Check if the message text is at least 5 characters long
