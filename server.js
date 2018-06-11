@@ -170,6 +170,57 @@ app.post("/api/messages", verifyToken, async function(req, res) {
 
 });
 
+app.delete("/api/messages/:messageId", verifyToken, async function(req, res) {
+	var messageId = req.params.messageId;
+	var messageFrom, loggedUserName;
+
+	await Message.findById(messageId, function (error, message) {
+		if (error) {
+			var response = {
+				error: error,
+				message: "Error retrieving the message"
+			};
+
+			return res.status(500).send(response);
+		}
+
+		if (message) {
+			messageFrom = message.from;
+		}	
+	});
+
+	await User.findById(req.userId, function (error, user) {
+		if (error) {
+			var response = {
+				error: error,
+				message: "Error retrieving the logged user"
+			};
+
+			return res.status(500).send(response);
+		}
+
+		if (user) {
+			loggedUserName = user.name;
+		}	
+	});
+
+	if (messageFrom === loggedUserName) {
+		Message.remove({ _id: messageId }, function(err) {
+			if (err) {
+				var response = {
+					error: error,
+					message: "Error deleting the message"
+				};
+
+				return res.status(500).json(response);
+			}
+
+			return res.status(204);
+		});
+	}
+
+});
+
 // ============ AUTH CONTROL ============
 
 function createToken(user) {
